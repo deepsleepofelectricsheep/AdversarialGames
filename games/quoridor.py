@@ -23,6 +23,7 @@ class Quoridor:
         self.size = size
         self.numwalls = numwalls
         self.directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
         # Precompute valid wall positions
         self.wall_placement_candidates = [
             (i, j) for i in range(self.size - 1) for j in range(self.size - 1)
@@ -67,7 +68,7 @@ class Quoridor:
             return [(-1, 1), (-1, -1)]      
 
     def _is_blocked(self, p1: Tuple[int, int], p2: Tuple[int, int], h_walls: list[Tuple[int, int]], v_walls: list[Tuple[int, int]]) -> bool:
-        
+
         if p1[0] == p2[0]:
             for wall in h_walls:
                 if wall[0] == p1[0] or wall[0] == p1[0] - 1:
@@ -89,6 +90,7 @@ class Quoridor:
         if p[0] < self.size and p[0] >= 0:
             if p[1] < self.size and p[1] >= 0:
                 return True
+            
         return False
     
     def _get_pawn_moves(self, state: State) -> list[Tuple[int, int]]:
@@ -118,11 +120,11 @@ class Quoridor:
                 if self._in_bounds(successor.p1) and self._in_bounds(successor.p2):
                     if state.turn == 1:
                         if not self._is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
-                            legal_pawn_moves.append(direction)
+                            legal_pawn_moves.append(hop)
                             failed = False
                     elif state.turn == 2:
                         if not self._is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
-                            legal_pawn_moves.append(direction)
+                            legal_pawn_moves.append(hop)
                             failed = False
 
                 # Next, try hopping diagonally
@@ -132,16 +134,24 @@ class Quoridor:
                         if self._in_bounds(successor.p1) and self._in_bounds(successor.p2):
                             if state.turn == 1:
                                 if not self._is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
-                                    legal_pawn_moves.append(direction)
+                                    legal_pawn_moves.append(hop)
                             elif state.turn == 2:
                                 if not self._is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
-                                    legal_pawn_moves.append(direction)
+                                    legal_pawn_moves.append(hop)
 
         return legal_pawn_moves
     
     def _get_h_wall_placements(self, state: State) -> list[Tuple[int, int]]:
         
         legal_placements = []
+
+        if state.turn == 1:
+            if state.p1_numwalls <= 0:
+                return legal_placements
+            
+        if state.turn == 1:
+            if state.p2_numwalls <= 0:
+                return legal_placements
 
         for candidate in self.wall_placement_candidates:
            if candidate not in state.h_walls:
@@ -155,6 +165,14 @@ class Quoridor:
         
         legal_placements = []
 
+        if state.turn == 1:
+            if state.p1_numwalls <= 0:
+                return legal_placements
+            
+        if state.turn == 1:
+            if state.p2_numwalls <= 0:
+                return legal_placements
+
         for candidate in self.wall_placement_candidates:
            if candidate not in state.v_walls:
                successor = self.successor(state, ('v_wall', candidate))
@@ -165,22 +183,27 @@ class Quoridor:
 
     def actions(self, state: State) -> list[Tuple[str, Any]]:
         actions = []
+
         # Pawn moves
         pawn_moves = self._get_pawn_moves(state) 
         for pawn_move in pawn_moves:
             actions.append(('pawn', pawn_move))
+
         # Horizontal wall placements
         h_wall_placements = self._get_h_wall_placements(state)
         for h_wall_placement in h_wall_placements:
             actions.append(('h_wall', h_wall_placement))
+
         # Vertical wall placements
         v_wall_placements = self._get_v_wall_placements(state)
         for v_wall_placement in v_wall_placements:
             actions.append(('v_wall', v_wall_placement))
+
         return actions
     
     def successor(self, state: State, action: Tuple[str, Any]) -> State:
         move_type, move = action
+
         # Move was a pawn move
         if move_type == 'pawn':
             return State(
@@ -192,6 +215,7 @@ class Quoridor:
                 h_walls=state.h_walls,
                 v_walls=state.v_walls
             )
+        
         # Move was a h_wall placement
         if move_type == 'h_wall':
             h_walls = [h_wall for h_wall in state.h_walls]
@@ -205,6 +229,7 @@ class Quoridor:
                 h_walls=frozenset(h_walls),
                 v_walls=state.v_walls
             )
+        
         # Move was a v_wall placement
         if move_type == 'v_wall':
             v_walls = [v_wall for v_wall in state.v_walls]
@@ -218,10 +243,11 @@ class Quoridor:
                 h_walls=state.h_walls,
                 v_walls=frozenset(v_walls)
             )
+        
         # Unknown move type
         else: 
             raise ValueError("Invalid move type.")
         
     def visualize(self, state: State) -> None:
         #TODO: Implement method to visualize Quoridor board, complete with row and column labels.
-        raise NotImplementedError()
+        raise NotImplementedError()        
