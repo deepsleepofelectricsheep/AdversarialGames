@@ -28,6 +28,11 @@ def simple():
             print('Simple pawn moves test failed. '
                   f'Got unexpected pawn move from starting position: {pawn_move}.')
     # Do the pawn moves result in the correct successors? 
+    action = (0, 1)
+    successor = game.successor(start_state, ('pawn', action))
+    expected_p1 = (expected_start_state.p1[0] + action[0], expected_start_state.p1[1] + action[1])
+    if successor.p1 != expected_p1 or successor.p2 != expected_start_state.p2:
+        print('The wrong successor was generated.')
 
 
 if __name__ == '__main__':

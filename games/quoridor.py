@@ -67,6 +67,19 @@ class Quoridor:
             return [(-1, 1), (-1, -1)]      
 
     def _is_blocked(self, p1: Tuple[int, int], p2: Tuple[int, int], h_walls: list[Tuple[int, int]], v_walls: list[Tuple[int, int]]) -> bool:
+        
+        if p1[0] == p2[0]:
+            for wall in h_walls:
+                if wall[0] == p1[0] or wall[0] == p1[0] - 1:
+                    if wall[1] == min(p1[1], p2[1]):
+                        return True
+                    
+        if p1[1] == p2[1]:
+            for wall in v_walls:
+                if wall[1] == p1[1] or wall[1] == p1[1] - 1:
+                    if wall[0] == min(p1[0], p2[0]):
+                        return True        
+
         return False
     
     def _path_exists(self, p1: Tuple[int, int], p2: Tuple[int, int], h_walls: list[Tuple[int, int]], v_walls: list[Tuple[int, int]]) -> bool:
