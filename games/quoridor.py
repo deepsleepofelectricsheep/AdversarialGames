@@ -66,8 +66,11 @@ class Quoridor:
         if direction == (-1, 0):
             return [(-1, 1), (-1, -1)]      
 
-    def _is_blocked(self, p1: Tuple[int, int], p2: Tuple[int, int]) -> bool:
+    def _is_blocked(self, p1: Tuple[int, int], p2: Tuple[int, int], h_walls: list[Tuple[int, int]], v_walls: list[Tuple[int, int]]) -> bool:
         return False
+    
+    def _path_exists(self, p1: Tuple[int, int], p2: Tuple[int, int], h_walls: list[Tuple[int, int]], v_walls: list[Tuple[int, int]]) -> bool:
+        return True
     
     def _get_pawn_moves(self, state: State) -> list[Tuple[int, int]]:
 
@@ -79,10 +82,10 @@ class Quoridor:
             if successor.p1 != successor.p2:
                 if successor.p1 < (self.size, self.size) and successor.p2 < (self.size, self.size):
                     if state.turn == 1:
-                        if not self.is_blocked(state.p1, successor.p1):
+                        if not self.is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)
                     elif state.turn == 2:
-                        if not self.is_blocked(state.p2, successor.p2):
+                        if not self.is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)      
 
         # Unhappy path: orthogonal square is occupied by opponent
@@ -95,11 +98,11 @@ class Quoridor:
                 successor = self.successor(state, ('pawn', hop))
                 if successor.p1 < (self.size, self.size) and successor.p2 < (self.size, self.size):
                     if state.turn == 1:
-                        if not self.is_blocked(state.p1, successor.p1):
+                        if not self.is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)
                             failed = False
                     elif state.turn == 2:
-                        if not self.is_blocked(state.p2, successor.p2):
+                        if not self.is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)
                             failed = False
 
@@ -109,30 +112,37 @@ class Quoridor:
                         successor = self.successor(state, ('pawn', hop))
                         if successor.p1 < (self.size, self.size) and successor.p2 < (self.size, self.size):
                             if state.turn == 1:
-                                if not self.is_blocked(state.p1, successor.p1):
+                                if not self.is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
                                     legal_pawn_moves.append(direction)
                             elif state.turn == 2:
-                                if not self.is_blocked(state.p2, successor.p2):
+                                if not self.is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
                                     legal_pawn_moves.append(direction)
 
         return legal_pawn_moves
     
     def _get_h_wall_placements(self, state: State) -> list[Tuple[int, int]]:
-        # TODO:
-        # Iterate over candidate locations
-        # Check if there isn't already a h_wall at the candidate location
-        # Check if the h_wall does not entirely block either player
         
         legal_placements = []
 
         for candidate in self.wall_placement_candidates:
-            pass
+           if candidate not in state.h_walls:
+               successor = self.successor(state, ('h_wall', candidate))
+               if self._path_exists(successor.p1, successor.p2, successor.h_walls, successor.v_walls):
+                   legal_placements.append(candidate)
 
-        return None
-
+        return legal_placements
+    
     def _get_v_wall_placements(self, state: State) -> list[Tuple[int, int]]:
-        # TODO: Implement vertical wall move fetched that returns legal moves.
-        return NotImplementedError()    
+        
+        legal_placements = []
+
+        for candidate in self.wall_placement_candidates:
+           if candidate not in state.v_walls:
+               successor = self.successor(state, ('v_wall', candidate))
+               if self._path_exists(successor.p1, successor.p2, successor.h_walls, successor.v_walls):
+                   legal_placements.append(candidate)
+
+        return legal_placements  
 
     def actions(self, state: State) -> list[Tuple[str, Any]]:
         actions = []
