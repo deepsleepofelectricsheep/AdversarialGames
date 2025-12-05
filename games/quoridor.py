@@ -72,6 +72,12 @@ class Quoridor:
     def _path_exists(self, p1: Tuple[int, int], p2: Tuple[int, int], h_walls: list[Tuple[int, int]], v_walls: list[Tuple[int, int]]) -> bool:
         return True
     
+    def _in_bounds(self, p: Tuple[int, int]) -> bool:
+        if p[0] < self.size and p[0] >= 0:
+            if p[1] < self.size and p[1] >= 0:
+                return True
+        return False
+    
     def _get_pawn_moves(self, state: State) -> list[Tuple[int, int]]:
 
         legal_pawn_moves = []
@@ -80,12 +86,12 @@ class Quoridor:
         for direction in self.directions:
             successor = self.successor(state, ('pawn', direction))
             if successor.p1 != successor.p2:
-                if successor.p1 < (self.size, self.size) and successor.p2 < (self.size, self.size):
+                if self._in_bounds(successor.p1) and self._in_bounds(successor.p2):
                     if state.turn == 1:
-                        if not self.is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
+                        if not self._is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)
                     elif state.turn == 2:
-                        if not self.is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
+                        if not self._is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)      
 
         # Unhappy path: orthogonal square is occupied by opponent
@@ -96,13 +102,13 @@ class Quoridor:
                 failed = True
                 hop = self._hop_straight(direction)
                 successor = self.successor(state, ('pawn', hop))
-                if successor.p1 < (self.size, self.size) and successor.p2 < (self.size, self.size):
+                if self._in_bounds(successor.p1) and self._in_bounds(successor.p2):
                     if state.turn == 1:
-                        if not self.is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
+                        if not self._is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)
                             failed = False
                     elif state.turn == 2:
-                        if not self.is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
+                        if not self._is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
                             legal_pawn_moves.append(direction)
                             failed = False
 
@@ -110,12 +116,12 @@ class Quoridor:
                 if failed:
                     for hop in self._hop_diagonally(direction):
                         successor = self.successor(state, ('pawn', hop))
-                        if successor.p1 < (self.size, self.size) and successor.p2 < (self.size, self.size):
+                        if self._in_bounds(successor.p1) and self._in_bounds(successor.p2):
                             if state.turn == 1:
-                                if not self.is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
+                                if not self._is_blocked(state.p1, successor.p1, state.h_walls, state.v_walls):
                                     legal_pawn_moves.append(direction)
                             elif state.turn == 2:
-                                if not self.is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
+                                if not self._is_blocked(state.p2, successor.p2, state.h_walls, state.v_walls):
                                     legal_pawn_moves.append(direction)
 
         return legal_pawn_moves
