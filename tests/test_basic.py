@@ -85,6 +85,19 @@ def simple():
         print('The correct hop straight move was not generated')
         print(actions)
 
+    # Manual check: Does the visualized board look right?
+    game = Quoridor(size=5, numwalls=3)
+    state = QuoridorState(
+        p1=(1, 0), 
+        p2=(1, 1), 
+        p1_numwalls=0, 
+        p2_numwalls=0,
+        turn=1,
+        h_walls=frozenset([(1, 0)]),
+        v_walls=frozenset([(2, 1)])
+    )
+    game.visualize(state)
+
 
 if __name__ == '__main__':
     simple()

@@ -246,8 +246,39 @@ class Quoridor:
         
         # Unknown move type
         else: 
-            raise ValueError("Invalid move type.")
+            raise ValueError('Invalid move type.')
         
     def visualize(self, state: State) -> None:
-        #TODO: Implement method to visualize Quoridor board, complete with row and column labels.
-        raise NotImplementedError()        
+
+        for y in reversed(range(self.size)):
+            row = f'{y} '
+            for x in range(self.size):
+                # Draw players
+                if state.p1 == (x, y):
+                    row += 'X'
+                elif state.p2 == (x, y):
+                    row += 'O'
+                else:
+                    row += '.'
+                
+                # Draw vertical walls to the right of the marker
+                if (x, y) in state.v_walls or (x, y-1) in state.v_walls:
+                    row += '|'
+                else:
+                    row += ' '
+
+            print(row)
+
+            # Draw horizontal walls below the marker
+            row = '  '
+            for x in range(self.size):
+                if (x, y-1) in state.h_walls or (x-1, y-1) in state.h_walls:
+                    row += '--'
+                else:
+                    row += '  '
+            print(row)   
+
+        footer = '  ' + ' '.join([str(x) for x in range(self.size)])
+        print(footer)
+
+       
