@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Tuple, Any
+from games.base import AdversarialGame
 import random
 
 
@@ -18,7 +19,7 @@ class State:
         return True
     
 
-class Quoridor:
+class Quoridor(AdversarialGame):
     def __init__(self, size=5, numwalls=3) -> None:
         self.size = size
         self.numwalls = numwalls

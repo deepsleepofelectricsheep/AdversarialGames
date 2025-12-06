@@ -1,8 +1,10 @@
 from games.quoridor import State as QuoridorState
 from games.quoridor import Quoridor
+from agents.random import RandomAgent
+from agents.minimax import MiniMax
 
 
-def simple():
+def test_game_state():
     # Does the game return the correct start state? 
     game = Quoridor(size=3, numwalls=3)
     start_state = game.start_state()
@@ -16,9 +18,9 @@ def simple():
         v_walls=frozenset()
     )
     if expected_start_state.p1 != start_state.p1:
-        print('Start position of player 1 not correct')
+        print('Start position of player 1 not correct.')
     if expected_start_state.p2 != start_state.p2:
-        print('Start position of player 2 not correct')
+        print('Start position of player 2 not correct.')
 
     # Does the game return the correct legal moves for a simple start position?
     actions = game.actions(start_state)
@@ -51,7 +53,7 @@ def simple():
     for action in actions:
         if action not in expected_actions:
             print('The following invalid action was generated for player 1 '
-                  f'if a h_wall is placed at (1, 0): {action}')
+                  f'if a h_wall is placed at (1, 0): {action}.')
 
     state = QuoridorState(
         p1=(1, 0), 
@@ -67,7 +69,7 @@ def simple():
     for action in actions:
         if action not in expected_actions:
             print('The following invalid action was generated for player 1 '
-                  f'if a v_wall is placed at (1, 0): {action}')
+                  f'if a v_wall is placed at (1, 0): {action}.')
             
     # If the two pawns are orthoginally adjacent, are hop straight moves generated appropriately?
     state = QuoridorState(
@@ -82,7 +84,7 @@ def simple():
     actions = game.actions(state)
     expected_action = ('pawn', (0, 2))
     if expected_action not in actions:
-        print('The correct hop straight move was not generated')
+        print('The correct hop straight move was not generated.')
         print(actions)
 
     # Manual check: Does the visualized board look right?
@@ -96,8 +98,31 @@ def simple():
         h_walls=frozenset([(1, 0)]),
         v_walls=frozenset([(2, 1)])
     )
+    print('Does the following board look right?')
+    print()
     game.visualize(state)
 
 
+def test_agents():
+    # Check if random agent returns a legal action
+    game = Quoridor(size=5, numwalls=5)
+    start_state = game.start_state()
+    random_agent = RandomAgent(game=game)
+    possible_actions = game.actions(start_state)
+    chosen_action = random_agent.action(start_state)
+    if chosen_action not in possible_actions:
+        print('The random agent did not return a legal action.')
+
+    # Check if MiniMax agent returns a legal action
+    game = Quoridor(size=5, numwalls=5)
+    start_state = game.start_state()
+    minimax_agent = MiniMax(game=game)
+    possible_actions = game.actions(start_state)
+    chosen_action = minimax_agent.action(start_state)
+    if chosen_action not in possible_actions:
+        print('The MiniMax agent did not return a legal action.')    
+
+
 if __name__ == '__main__':
-    simple()
+    test_game_state()
+    test_agents()
